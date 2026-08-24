@@ -1,0 +1,30 @@
+{
+	"name": "dsh-wide-stats-footer",
+	"version": "0.1.0",
+	"description": "Wide stats footer: removes the max-width clamp on the composer stats line (turns/steps | LLM time | TTFT | cache hit | token counts) so it spans the full composer width, centered",
+	"type": "module",
+	"main": "index.js",
+	"exports": {
+		".": "./index.js",
+		"./client": "./client.js",
+		"./package.json": "./package.json"
+	},
+	"files": ["index.js", "client.js", "cordis.patch.yml", "README.md", "LICENSE"],
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/thomasvvugt/dsh-wide-stats-footer.git"
+	},
+	"homepage": "https://github.com/thomasvvugt/dsh-wide-stats-footer#readme",
+	"bugs": {
+		"url": "https://github.com/thomasvvugt/dsh-wide-stats-footer/issues"
+	},
+	"keywords": ["dsh", "dsh-plugin", "deepseek-harness", "plugin", "web", "css", "footer", "stats"],
+	"dsh": {
+		"bundle": { "patch": "./cordis.patch.yml" },
+		"client": {
+			"platform": "web",
+			"inject": ["@deepseek-ai/dsh-client-runtime"]
+		}
+	}
+}
