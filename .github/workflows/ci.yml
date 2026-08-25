@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Verify package metadata
+        run: |
+          node -e "
+            const pkg = require('./package.json');
+            const mustHave = ['name','version','description','license','repository','homepage','bugs'];
+            for (const k of mustHave) if (!pkg[k]) throw new Error('package.json missing: ' + k);
+            if (pkg.scripts) throw new Error('install scripts are forbidden');
+            console.log('metadata OK:', pkg.name, pkg.version);
+          "
+
+      - name: Syntax-check sources
+        run: |
+          node --check index.js
+          node --check client.js
+
+      - name: Validate patch layer YAML
+        run: |
+          node -e "
+            const fs = require('fs');
+            const s = fs.readFileSync('cordis.patch.yml','utf8');
+            if (!/^---\n/m.test(s) && !/^---\r?\n/.test(s) && !s.trimStart().startsWith('---')) {
+              // cordis patch layers are YAML; just confirm non-empty and parseable-looking
+              if (s.trim().length === 0) throw new Error('empty patch layer');
+            }
+            console.log('patch layer present,', s.length, 'bytes');
+          "
+
+      - name: Pack smoke check
+        run: |
+          npm pack --dry-run
