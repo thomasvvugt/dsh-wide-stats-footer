@@ -88,6 +88,41 @@ Open DevTools and read `window.__WIDE_STATS_FOOTER__`:
 `styleHash`/`domHash` show the discovered CSS-module prefix from each source; a `null`
 there means that source hasn't matched. One `console.info` line is logged per boot.
 
+## Troubleshooting / FAQ
+
+**The footer is still clamped.**
+Check `window.__WIDE_STATS_FOOTER__` in DevTools:
+
+- `styleHash: null` **and** `domHash: null` — hash discovery matched nothing.
+  This means your DSH build's markup/CSS differs from the verified shape
+  (e.g. a newer DSH release). The plugin has degraded to a no-op; please
+  [open an issue](https://github.com/thomasvvugt/dsh-wide-stats-footer/issues)
+  with your DSH version and the diagnostics object.
+- Hashes present but `overrideChars: 0` — the override rule was written but
+  the base clamp rule wasn't the expected shape. Also worth an issue.
+- `appliedAt: null` — the plugin never ran; confirm it's actually installed
+  (`dsh --profile web --dump-config` should show the layer) and that you
+  restarted `dsh web` after installing.
+
+**It worked, then stopped after a DSH update.**
+Expected occasionally: the CSS-module hash rotates on rebuilds. The plugin
+rediscovers it at runtime, so a stop after an update means the *markup*
+changed shape. Check the diagnostics object and report it.
+
+**Does this slow the app down?**
+No. Discovery runs once per boot plus on observed DOM/style mutations; the
+observers do no periodic polling.
+
+**Can I change the alignment (left/right instead of centered)?**
+Not via config — this plugin deliberately has no configuration and does one
+thing. The base `text-align: center` from DSH is preserved.
+
+**Does it work with custom themes?**
+Yes. The override uses doubled-class specificity (0,2,0), so it wins over
+the stock rule regardless of stylesheet order. A theme that itself overrides
+the footer's `max-width` with equal-or-higher specificity will win — that's
+correct behavior.
+
 ## Compatibility
 
 Built and verified against DSH `0.1.1-rc.2` web. Client-only: no host-side behavior, no
