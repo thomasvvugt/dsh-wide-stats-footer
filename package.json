@@ -1,6 +1,6 @@
 {
 	"name": "dsh-wide-stats-footer",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "Wide stats footer: removes the max-width clamp on the composer stats line (turns/steps | LLM time | TTFT | cache hit | token counts) so it spans the full composer width, centered",
 	"type": "module",
 	"main": "index.js",
