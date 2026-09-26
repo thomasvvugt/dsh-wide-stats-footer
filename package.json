@@ -10,6 +10,7 @@
 		"./package.json": "./package.json"
 	},
 	"files": ["index.js", "client.js", "cordis.patch.yml", "README.md", "LICENSE"],
+	"scripts": { "test": "node --test test/" },
 	"license": "MIT",
 	"repository": {
 		"type": "git",

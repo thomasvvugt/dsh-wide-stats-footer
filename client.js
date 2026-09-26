@@ -26,9 +26,11 @@
  *
  * The hash is NEVER hardcoded (it changes on every rebuild of the
  * conversation package). It is discovered from two independent sources:
- *   - stylesheets: the unique separator rule
- *     `.{hash}_sep{color:var(--dsw-alias-separator-primary);margin:0 10px}`
- *     verified against the sibling `.{hash}_root` width clamp;
+ *   - stylesheets: the unique separator rule `.{hash}_sep` carrying the
+ *     stats-line separator color (var(--dsw-alias-separator-primary)) — its
+ *     margin values are host-version-dependent (0.1.1: 0 10px, 0.1.5:
+ *     0 6px) and are deliberately NOT matched — verified against the
+ *     sibling `.{hash}_root` width clamp;
  *   - the DOM: <span class="{hash}_sep">|</span> — the only *_sep element
  *     in the app whose text content is a literal pipe — whose ancestor
  *     carries the matching `{hash}_root` class.
@@ -72,9 +74,6 @@ window.__ModuleLoader__.load({
 		/** Stats-line separator rule signature: `.{hash}_sep`, single class selector. */
 		var SEPARATOR_RULE = /^\.([A-Za-z0-9_-]+)_sep$/;
 
-		/** CSSOM normalization of the separator's `margin: 0 10px`. */
-		var SEPARATOR_MARGIN = "0px 10px";
-
 		/** The separator's rendered text — unique among *_sep elements. */
 		var SEPARATOR_TEXT = "|";
 
@@ -102,8 +101,11 @@ window.__ModuleLoader__.load({
 
 		/**
 		 * Discover the stats footer hash from the stylesheets: the unique
-		 * `.{hash}_sep` separator rule, verified against the sibling
-		 * `.{hash}_root` rule's width clamp.
+		 * `.{hash}_sep` separator rule carrying the separator color, verified
+		 * against the sibling `.{hash}_root` rule's width clamp. Only the
+		 * color and the clamp are matched — the separator's margins changed
+		 * between host releases (0.1.1 `0 10px`, 0.1.5 `0 6px`) and must not
+		 * gate discovery.
 		 * @returns the hash, or null when not (yet) present.
 		 */
 		function hashFromStylesheets() {
@@ -112,9 +114,7 @@ window.__ModuleLoader__.load({
 				var selector = rule.selectorText || "";
 				var match = selector.length === 0 ? null : selector.match(SEPARATOR_RULE);
 				if (match === null) return;
-				var style = rule.style;
-				if (style.margin !== SEPARATOR_MARGIN) return;
-				if ((style.color || "").indexOf("--dsw-alias-separator-primary") === -1) return;
+				if ((rule.style.color || "").indexOf("--dsw-alias-separator-primary") === -1) return;
 				hash = match[1];
 				return false;
 			});
